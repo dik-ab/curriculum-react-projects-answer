@@ -3,6 +3,85 @@ import { io, Socket } from 'socket.io-client';
 import { apiFetch } from '../lib/apiClient';
 import type { Conversation, Message, User } from '../types';
 
+type MessageHandler = (message: Message) => void;
+
+type RealtimeClient = {
+  joinConversation: (conversationId: number) => void;
+  onNewMessage: (handler: MessageHandler) => () => void;
+  sendMessage: (conversationId: number, content: string) => boolean;
+  disconnect: () => void;
+};
+
+function createSocketIoClient(socketUrl: string): RealtimeClient {
+  const socket: Socket = io(`${socketUrl}/chat`, {
+    withCredentials: true,
+  });
+
+  return {
+    joinConversation: (conversationId) => {
+      socket.emit('joinConversation', { conversationId });
+    },
+    onNewMessage: (handler) => {
+      socket.on('newMessage', handler);
+      return () => socket.off('newMessage', handler);
+    },
+    sendMessage: (conversationId, content) => {
+      socket.emit('sendMessage', { conversationId, content });
+      return true;
+    },
+    disconnect: () => socket.disconnect(),
+  };
+}
+
+function createWebSocketClient(socketUrl: string): RealtimeClient {
+  const wsUrl = `${socketUrl}/chat`.replace(/^http/, 'ws');
+  const socket = new WebSocket(wsUrl);
+  const joinedConversationIds = new Set<number>();
+  const handlers = new Set<MessageHandler>();
+
+  const sendJson = (payload: unknown) => {
+    if (socket.readyState !== WebSocket.OPEN) return false;
+    socket.send(JSON.stringify(payload));
+    return true;
+  };
+
+  socket.addEventListener('open', () => {
+    joinedConversationIds.forEach((conversationId) => {
+      sendJson({ type: 'joinConversation', conversationId });
+    });
+  });
+  socket.addEventListener('message', (event) => {
+    const packet = JSON.parse(event.data) as {
+      type?: string;
+      message?: Message;
+    };
+    if (packet.type !== 'newMessage' || packet.message === undefined) return;
+    handlers.forEach((handler) => handler(packet.message as Message));
+  });
+
+  return {
+    joinConversation: (conversationId) => {
+      joinedConversationIds.add(conversationId);
+      sendJson({ type: 'joinConversation', conversationId });
+    },
+    onNewMessage: (handler) => {
+      handlers.add(handler);
+      return () => handlers.delete(handler);
+    },
+    sendMessage: (conversationId, content) =>
+      sendJson({ type: 'sendMessage', conversationId, content }),
+    disconnect: () => socket.close(),
+  };
+}
+
+function createRealtimeClient(socketUrl: string): RealtimeClient {
+  if (import.meta.env.VITE_REALTIME_DRIVER === 'websocket') {
+    return createWebSocketClient(socketUrl);
+  }
+
+  return createSocketIoClient(socketUrl);
+}
+
 export default function ChatPage() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [selected, setSelected] = useState<Conversation | null>(null);
@@ -11,15 +90,13 @@ export default function ChatPage() {
   const [username, setUsername] = useState('');
   const [text, setText] = useState('');
   const [error, setError] = useState('');
-  const socketRef = useRef<Socket | null>(null);
+  const socketRef = useRef<RealtimeClient | null>(null);
 
   // 1. WebSocket接続（マウント時に1回だけ。アンマウントで切断）
   useEffect(() => {
     const socketUrl =
       import.meta.env.VITE_SOCKET_URL ?? import.meta.env.VITE_API_URL;
-    const socket = io(`${socketUrl}/chat`, {
-      withCredentials: true,
-    });
+    const socket = createRealtimeClient(socketUrl);
     socketRef.current = socket;
     return () => {
       socket.disconnect();
@@ -47,16 +124,13 @@ export default function ChatPage() {
       .catch((e) =>
         setError(e instanceof Error ? e.message : 'エラーが発生しました'),
       );
-    socket.emit('joinConversation', { conversationId: selected.id });
+    socket.joinConversation(selected.id);
 
     const handleNewMessage = (message: Message) => {
       if (message.conversationId !== selected.id) return;
       setMessages((prev) => [...prev, message]);
     };
-    socket.on('newMessage', handleNewMessage);
-    return () => {
-      socket.off('newMessage', handleNewMessage);
-    };
+    return socket.onNewMessage(handleNewMessage);
   }, [selected]);
 
   const startConversation = async (e: React.FormEvent) => {
@@ -83,11 +157,12 @@ export default function ChatPage() {
   const sendMessage = (e: React.FormEvent) => {
     e.preventDefault();
     if (selected === null || text.trim() === '') return;
-    socketRef.current?.emit('sendMessage', {
-      conversationId: selected.id,
-      content: text,
-    });
-    setText('');
+    const sent = socketRef.current?.sendMessage(selected.id, text) ?? false;
+    if (sent) {
+      setText('');
+    } else {
+      setError('リアルタイム接続中です。少し待ってから再送してください。');
+    }
   };
 
   return (
