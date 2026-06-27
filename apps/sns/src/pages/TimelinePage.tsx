@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useState } from 'react';
+import { FormEvent, useCallback, useEffect, useState } from 'react';
 import { apiFetch } from '../lib/apiClient';
 import { Post, User } from '../types';
 import { PostCard } from '../components/PostCard';
@@ -13,7 +13,7 @@ export default function TimelinePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  const loadPosts = async () => {
+  const loadPosts = useCallback(async () => {
     try {
       const url = tab === 'all' ? '/posts' : '/posts/timeline';
       const data = await apiFetch<Post[]>(url);
@@ -24,7 +24,7 @@ export default function TimelinePage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [tab]);
 
   useEffect(() => {
     apiFetch<User>('/auth/me')
@@ -34,7 +34,7 @@ export default function TimelinePage() {
 
   useEffect(() => {
     loadPosts();
-  }, [tab]);
+  }, [loadPosts]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
