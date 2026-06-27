@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { PostCard } from '../components/PostCard';
 import { useHashRoute } from '../hooks/useHashRoute';
 import { apiFetch } from '../lib/apiClient';
@@ -13,7 +13,7 @@ export default function UserPage() {
   const [me, setMe] = useState<User | null>(null);
   const [error, setError] = useState('');
 
-  const load = async () => {
+  const load = useCallback(async () => {
     try {
       const [profileData, postsData] = await Promise.all([
         apiFetch<UserProfile>(`/users/${username}`),
@@ -25,7 +25,7 @@ export default function UserPage() {
     } catch (e) {
       setError(e instanceof Error ? e.message : 'エラーが発生しました');
     }
-  };
+  }, [username]);
 
   useEffect(() => {
     apiFetch<User>('/auth/me')
@@ -35,7 +35,7 @@ export default function UserPage() {
 
   useEffect(() => {
     load();
-  }, [username]);
+  }, [load]);
 
   const toggleFollow = async () => {
     if (profile === null) return;
