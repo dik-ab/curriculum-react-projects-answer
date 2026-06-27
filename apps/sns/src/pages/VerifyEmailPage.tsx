@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { apiFetch } from "../lib/apiClient";
 
 type Props = { path: string };
@@ -7,6 +7,7 @@ type Status = "loading" | "success" | "error";
 export default function VerifyEmailPage({ path }: Props) {
   const [status, setStatus] = useState<Status>("loading");
   const [message, setMessage] = useState("");
+  const requestedTokens = useRef(new Set<string>());
 
   useEffect(() => {
     const query = new URLSearchParams(path.split("?")[1]);
@@ -16,6 +17,11 @@ export default function VerifyEmailPage({ path }: Props) {
       setMessage("URLが正しくありません");
       return;
     }
+    if (requestedTokens.current.has(token)) {
+      return;
+    }
+    requestedTokens.current.add(token);
+
     apiFetch<{ message: string }>(`/auth/verify-email?token=${token}`)
       .then((res) => {
         setStatus("success");
