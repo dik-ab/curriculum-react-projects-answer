@@ -1,5 +1,4 @@
 import { useHashRoute } from './hooks/useHashRoute';
-import { isLoggedIn } from './lib/apiClient';
 import { Layout } from './components/Layout';
 import RegisterPage from './pages/RegisterPage';
 import LoginPage from './pages/LoginPage';
@@ -16,12 +15,6 @@ export default function App() {
   if (path === '/register') return <RegisterPage navigate={navigate} />;
   if (path === '/login') return <LoginPage navigate={navigate} />;
   if (path.startsWith('/verify-email')) return <VerifyEmailPage path={path} />;
-
-  // ここから下はログイン必須
-  if (!isLoggedIn()) {
-    location.hash = '#/login';
-    return null;
-  }
 
   if (path === '/') {
     return (

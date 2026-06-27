@@ -1,16 +1,10 @@
 const API_URL = import.meta.env.VITE_API_URL;
-const TOKEN_KEY = "token";
-
-export function saveToken(token: string): void {
-  localStorage.setItem(TOKEN_KEY, token);
-}
 
 export function clearToken(): void {
-  localStorage.removeItem(TOKEN_KEY);
 }
 
-export function isLoggedIn(): boolean {
-  return localStorage.getItem(TOKEN_KEY) !== null;
+export async function logout(): Promise<void> {
+  await apiFetch<void>('/auth/logout', { method: 'POST' }).catch(() => undefined);
 }
 
 export async function apiFetch<T>(
@@ -19,15 +13,15 @@ export async function apiFetch<T>(
 ): Promise<T> {
   const headers = new Headers(options.headers);
 
-  const token = localStorage.getItem(TOKEN_KEY);
-  if (token) {
-    headers.set("Authorization", `Bearer ${token}`);
-  }
   if (options.body) {
     headers.set("Content-Type", "application/json");
   }
 
-  const res = await fetch(`${API_URL}${path}`, { ...options, headers });
+  const res = await fetch(`${API_URL}${path}`, {
+    ...options,
+    credentials: 'include',
+    headers,
+  });
 
   if (res.status === 401 && !path.startsWith("/auth/")) {
     clearToken();

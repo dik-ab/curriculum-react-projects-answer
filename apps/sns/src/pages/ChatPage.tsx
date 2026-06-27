@@ -18,7 +18,7 @@ export default function ChatPage() {
     const socketUrl =
       import.meta.env.VITE_SOCKET_URL ?? import.meta.env.VITE_API_URL;
     const socket = io(`${socketUrl}/chat`, {
-      auth: { token: localStorage.getItem('token') },
+      withCredentials: true,
     });
     socketRef.current = socket;
     return () => {

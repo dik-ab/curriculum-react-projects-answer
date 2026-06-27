@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { apiFetch, saveToken } from "../lib/apiClient";
+import { apiFetch } from "../lib/apiClient";
 
 type Props = {
   navigate: (to: string) => void;
@@ -16,11 +16,10 @@ export default function LoginPage({ navigate }: Props) {
     setError(null);
     setSubmitting(true);
     try {
-      const res = await apiFetch<{ accessToken: string }>("/auth/login", {
+      await apiFetch("/auth/login", {
         method: "POST",
         body: JSON.stringify({ email, password }),
       });
-      saveToken(res.accessToken);
       navigate("/");
     } catch (err) {
       setError(err instanceof Error ? err.message : "ログインに失敗しました");

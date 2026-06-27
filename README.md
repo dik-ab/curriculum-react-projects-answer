@@ -62,6 +62,8 @@ VITE_API_URL=http://localhost:8000
 VITE_SOCKET_URL=http://localhost:8001
 ```
 
+SNSの認証はHttpOnly Cookie方式です。Reactはトークンを `localStorage` に保存せず、API呼び出しではCookieを送るために `credentials: "include"` を使います。
+
 ブラウザで `http://localhost:5173/` を開き、登録、メール確認、ログイン、投稿、いいね、フォロー、チャット、プロフィール編集を確認します。
 
 ## ポート

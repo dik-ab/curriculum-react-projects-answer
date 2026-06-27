@@ -1,13 +1,13 @@
 import { ReactNode } from 'react';
-import { clearToken } from '../lib/apiClient';
+import { logout } from '../lib/apiClient';
 
 type Props = {
   children: ReactNode;
 };
 
 export function Layout({ children }: Props) {
-  const handleLogout = () => {
-    clearToken();
+  const handleLogout = async () => {
+    await logout();
     location.hash = '#/login';
   };
 
