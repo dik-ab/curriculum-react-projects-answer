@@ -84,33 +84,44 @@ export function SettingsPage() {
     }
   };
 
-  if (loading) return <p>読み込み中...</p>;
+  if (loading) return <p className="status-text">読み込み中...</p>;
 
   return (
-    <div>
-      <h2>設定</h2>
+    <div className="settings-page">
+      <div className="section-heading">
+        <div>
+          <p className="eyebrow">Account</p>
+          <h1>設定</h1>
+        </div>
+      </div>
       {error && <p className="error">{error}</p>}
       {message && <p className="success">{message}</p>}
 
-      <section>
-        <h3>アイコン画像</h3>
-        {avatarUrl ? (
-          <img src={avatarUrl} alt="アイコン" className="avatar avatar-large" />
-        ) : (
-          <p>アイコンは未設定です</p>
-        )}
-        <input
-          type="file"
-          accept="image/png,image/jpeg"
-          onChange={handleFileChange}
-          disabled={uploading}
-        />
-        {uploading && <p>アップロード中...</p>}
+      <section className="settings-section avatar-section">
+        <div>
+          <h2>アイコン画像</h2>
+          {uploading && <p className="status-text">アップロード中...</p>}
+        </div>
+        <div className="avatar-upload">
+          {avatarUrl ? (
+            <img src={avatarUrl} alt="アイコン" className="avatar avatar-large" />
+          ) : (
+            <span className="avatar avatar-large avatar-placeholder">
+              {displayName.charAt(0)}
+            </span>
+          )}
+          <input
+            type="file"
+            accept="image/png,image/jpeg"
+            onChange={handleFileChange}
+            disabled={uploading}
+          />
+        </div>
       </section>
 
-      <section>
-        <h3>プロフィール</h3>
-        <form onSubmit={handleSubmit}>
+      <section className="settings-section">
+        <h2>プロフィール</h2>
+        <form className="settings-form" onSubmit={handleSubmit}>
           <label>
             表示名
             <input
