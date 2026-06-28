@@ -30,24 +30,30 @@ export default function LoginPage({ navigate }: Props) {
 
   return (
     <main className="auth-page">
-      <h1>ログイン</h1>
-      <form onSubmit={handleSubmit}>
-        <label>
-          メールアドレス
-          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-        </label>
-        <label>
-          パスワード
-          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-        </label>
-        <button type="submit" disabled={submitting}>
-          {submitting ? "ログイン中..." : "ログイン"}
-        </button>
-      </form>
-      {error && <p className="error">{error}</p>}
-      <p>
-        アカウントがない場合は <a href="#/register">ユーザー登録</a>
-      </p>
+      <section className="auth-panel">
+        <div className="auth-brand">
+          <span className="logo-mark">S</span>
+          <span>SNS</span>
+        </div>
+        <h1>ログイン</h1>
+        <form onSubmit={handleSubmit}>
+          <label>
+            メールアドレス
+            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+          </label>
+          <label>
+            パスワード
+            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+          </label>
+          <button type="submit" disabled={submitting}>
+            {submitting ? "ログイン中..." : "ログイン"}
+          </button>
+        </form>
+        {error && <p className="error">{error}</p>}
+        <p className="auth-switch">
+          アカウントがない場合は <a href="#/register">ユーザー登録</a>
+        </p>
+      </section>
     </main>
   );
 }
