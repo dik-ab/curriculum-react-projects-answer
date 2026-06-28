@@ -75,37 +75,51 @@ export default function UserPage() {
   };
 
   if (profile === null) {
-    return <p>{error !== '' ? error : '読み込み中...'}</p>;
+    return <p className="status-text">{error !== '' ? error : '読み込み中...'}</p>;
   }
 
   return (
-    <>
-      {error !== '' && <p>{error}</p>}
-      <section>
-        <h2>{profile.displayName}</h2>
-        <p>@{profile.username}</p>
-        {profile.bio !== '' && <p>{profile.bio}</p>}
-        <p>
-          フォロー {profile.followingCount} ／ フォロワー{' '}
-          {profile.followersCount}
-        </p>
-        <button onClick={toggleFollow}>
+    <div className="profile-page">
+      {error !== '' && <p className="error">{error}</p>}
+      <section className="profile-hero">
+        {profile.avatarUrl ? (
+          <img src={profile.avatarUrl} alt="アイコン" className="avatar avatar-large" />
+        ) : (
+          <span className="avatar avatar-large avatar-placeholder">
+            {profile.displayName.charAt(0)}
+          </span>
+        )}
+        <div className="profile-summary">
+          <p className="eyebrow">Profile</p>
+          <h1>{profile.displayName}</h1>
+          <p className="profile-username">@{profile.username}</p>
+          {profile.bio !== '' && <p className="profile-bio">{profile.bio}</p>}
+          <div className="profile-stats">
+            <span>フォロー {profile.followingCount}</span>
+            <span>フォロワー {profile.followersCount}</span>
+          </div>
+        </div>
+        <button className="profile-follow-button" onClick={toggleFollow}>
           {profile.isFollowing ? 'フォロー解除' : 'フォローする'}
         </button>
       </section>
-      <section>
-        <h3>投稿</h3>
-        {posts.length === 0 && <p>まだ投稿がありません。</p>}
-        {posts.map((post) => (
-          <PostCard
-            key={post.id}
-            post={post}
-            currentUserId={me?.id ?? null}
-            onDelete={handleDelete}
-            onToggleLike={handleToggleLike}
-          />
-        ))}
+      <section className="profile-posts">
+        <div className="section-heading">
+          <h2>投稿</h2>
+        </div>
+        {posts.length === 0 && <p className="empty-state">まだ投稿がありません。</p>}
+        <div className="post-list">
+          {posts.map((post) => (
+            <PostCard
+              key={post.id}
+              post={post}
+              currentUserId={me?.id ?? null}
+              onDelete={handleDelete}
+              onToggleLike={handleToggleLike}
+            />
+          ))}
+        </div>
       </section>
-    </>
+    </div>
   );
 }
