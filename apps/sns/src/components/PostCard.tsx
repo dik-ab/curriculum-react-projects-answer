@@ -22,19 +22,22 @@ export function PostCard({
   return (
     <article className="post-card">
       <div className="post-header">
-        {post.author.avatarUrl ? (
-          <img
-            src={post.author.avatarUrl}
-            alt={`${post.author.displayName}のアイコン`}
-            className="avatar"
-          />
-        ) : (
-          <span className="avatar avatar-placeholder">
-            {post.author.displayName.charAt(0)}
+        <a className="post-author-link" href={`#/users/${post.author.username}`}>
+          {post.author.avatarUrl ? (
+            <img
+              src={post.author.avatarUrl}
+              alt={`${post.author.displayName}のアイコン`}
+              className="avatar"
+            />
+          ) : (
+            <span className="avatar avatar-placeholder">
+              {post.author.displayName.charAt(0)}
+            </span>
+          )}
+          <span>
+            <span className="post-display-name">{post.author.displayName}</span>
+            <span className="post-username">@{post.author.username}</span>
           </span>
-        )}
-        <a href={`#/users/${post.author.username}`}>
-          <strong>{post.author.displayName}</strong> @{post.author.username}
         </a>
         <time className="post-date">{formatDate(post.createdAt)}</time>
       </div>
