@@ -79,32 +79,47 @@ export default function TimelinePage() {
   };
 
   if (loading) {
-    return <p>読み込み中...</p>;
+    return <p className="status-text">読み込み中...</p>;
   }
 
   return (
     <div className="timeline">
-      <form className="post-form" onSubmit={handleSubmit}>
-        <textarea
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          maxLength={280}
-          rows={3}
-          placeholder="いまどうしてる？"
-        />
-        <div className="post-form-footer">
-          <span className="char-count">{content.length}/280</span>
-          <button type="submit" disabled={content.trim() === ''}>
-            投稿する
-          </button>
+      <section className="composer">
+        <div className="section-heading">
+          <div>
+            <p className="eyebrow">Timeline</p>
+            <h1>タイムライン</h1>
+          </div>
         </div>
-      </form>
+        <form className="post-form" onSubmit={handleSubmit}>
+          <textarea
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            maxLength={280}
+            rows={3}
+            placeholder="いまどうしてる？"
+          />
+          <div className="post-form-footer">
+            <span className="char-count">{content.length}/280</span>
+            <button type="submit" disabled={content.trim() === ''}>
+              投稿する
+            </button>
+          </div>
+        </form>
+      </section>
 
-      <div>
-        <button onClick={() => setTab('all')} disabled={tab === 'all'}>
+      <div className="tab-list" aria-label="タイムライン種別">
+        <button
+          className={tab === 'all' ? 'tab-button tab-button-active' : 'tab-button'}
+          onClick={() => setTab('all')}
+          disabled={tab === 'all'}
+        >
           全体
         </button>
         <button
+          className={
+            tab === 'following' ? 'tab-button tab-button-active' : 'tab-button'
+          }
           onClick={() => setTab('following')}
           disabled={tab === 'following'}
         >
@@ -115,21 +130,23 @@ export default function TimelinePage() {
       {error && <p className="error">{error}</p>}
 
       {posts.length === 0 ? (
-        <p>
+        <p className="empty-state">
           {tab === 'following'
             ? 'フォロー中のユーザーの投稿がまだありません。'
             : 'まだ投稿がありません。最初の投稿をしてみましょう。'}
         </p>
       ) : (
-        posts.map((post) => (
-          <PostCard
-            key={post.id}
-            post={post}
-            currentUserId={me?.id ?? null}
-            onDelete={handleDelete}
-            onToggleLike={handleToggleLike}
-          />
-        ))
+        <div className="post-list">
+          {posts.map((post) => (
+            <PostCard
+              key={post.id}
+              post={post}
+              currentUserId={me?.id ?? null}
+              onDelete={handleDelete}
+              onToggleLike={handleToggleLike}
+            />
+          ))}
+        </div>
       )}
     </div>
   );
