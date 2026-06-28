@@ -38,44 +38,58 @@ export default function RegisterPage(_props: Props) {
   if (registered) {
     return (
       <main className="auth-page">
-        <h1>確認メールを送りました</h1>
-        <p>
-          {email} 宛てに確認メールを送りました。メール内のURLを開いて、
-          登録を完了してください。
-        </p>
-        <p>（開発中はメールは送られず、APIのログにURLが表示されます）</p>
+        <section className="auth-panel">
+          <div className="auth-brand">
+            <span className="logo-mark">S</span>
+            <span>SNS</span>
+          </div>
+          <h1>確認メールを送りました</h1>
+          <p>
+            {email} 宛てに確認メールを送りました。メール内のURLを開いて、
+            登録を完了してください。
+          </p>
+          <p className="muted-text">
+            （開発中はメールは送られず、APIのログにURLが表示されます）
+          </p>
+        </section>
       </main>
     );
   }
 
   return (
     <main className="auth-page">
-      <h1>ユーザー登録</h1>
-      <form onSubmit={handleSubmit}>
-        <label>
-          メールアドレス
-          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-        </label>
-        <label>
-          ユーザー名（英小文字・数字・_ で3〜20文字）
-          <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} required />
-        </label>
-        <label>
-          表示名
-          <input type="text" value={displayName} onChange={(e) => setDisplayName(e.target.value)} required />
-        </label>
-        <label>
-          パスワード（8文字以上）
-          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-        </label>
-        <button type="submit" disabled={submitting}>
-          {submitting ? "登録中..." : "登録する"}
-        </button>
-      </form>
-      {error && <p className="error">{error}</p>}
-      <p>
-        アカウントを持っている場合は <a href="#/login">ログイン</a>
-      </p>
+      <section className="auth-panel">
+        <div className="auth-brand">
+          <span className="logo-mark">S</span>
+          <span>SNS</span>
+        </div>
+        <h1>ユーザー登録</h1>
+        <form onSubmit={handleSubmit}>
+          <label>
+            メールアドレス
+            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+          </label>
+          <label>
+            ユーザー名（英小文字・数字・_ で3〜20文字）
+            <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} required />
+          </label>
+          <label>
+            表示名
+            <input type="text" value={displayName} onChange={(e) => setDisplayName(e.target.value)} required />
+          </label>
+          <label>
+            パスワード（8文字以上）
+            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+          </label>
+          <button type="submit" disabled={submitting}>
+            {submitting ? "登録中..." : "登録する"}
+          </button>
+        </form>
+        {error && <p className="error">{error}</p>}
+        <p className="auth-switch">
+          アカウントを持っている場合は <a href="#/login">ログイン</a>
+        </p>
+      </section>
     </main>
   );
 }
