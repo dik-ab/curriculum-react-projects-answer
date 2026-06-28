@@ -35,17 +35,23 @@ export default function VerifyEmailPage({ path }: Props) {
 
   return (
     <main className="auth-page">
-      <h1>メールアドレスの確認</h1>
-      {status === "loading" && <p>確認しています...</p>}
-      {status === "success" && (
-        <>
-          <p>{message}</p>
-          <p>
-            <a href="#/login">ログインへ進む</a>
-          </p>
-        </>
-      )}
-      {status === "error" && <p className="error">{message}</p>}
+      <section className="auth-panel">
+        <div className="auth-brand">
+          <span className="logo-mark">S</span>
+          <span>SNS</span>
+        </div>
+        <h1>メールアドレスの確認</h1>
+        {status === "loading" && <p className="status-text">確認しています...</p>}
+        {status === "success" && (
+          <>
+            <p className="success">{message}</p>
+            <p>
+              <a className="primary-link" href="#/login">ログインへ進む</a>
+            </p>
+          </>
+        )}
+        {status === "error" && <p className="error">{message}</p>}
+      </section>
     </main>
   );
 }
