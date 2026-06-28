@@ -168,7 +168,11 @@ export default function ChatPage() {
   return (
     <div className="chat-layout">
       <aside className="chat-sidebar">
-        <form onSubmit={startConversation}>
+        <div className="chat-sidebar-header">
+          <p className="eyebrow">Messages</p>
+          <h1>チャット</h1>
+        </div>
+        <form className="chat-start-form" onSubmit={startConversation}>
           <input
             value={username}
             onChange={(e) => setUsername(e.target.value)}
@@ -176,16 +180,27 @@ export default function ChatPage() {
           />
           <button type="submit">会話を開始</button>
         </form>
-        {error !== '' && <p>{error}</p>}
-        <ul>
+        {error !== '' && <p className="error">{error}</p>}
+        <ul className="conversation-list">
           {conversations.map((c) => (
             <li key={c.id}>
-              <button onClick={() => setSelected(c)}>
-                <strong>{c.partner.displayName}</strong>
-                <br />
-                <small>
-                  {c.lastMessage?.content ?? '（メッセージはまだありません）'}
-                </small>
+              <button
+                className={
+                  selected?.id === c.id
+                    ? 'conversation-button conversation-button-active'
+                    : 'conversation-button'
+                }
+                onClick={() => setSelected(c)}
+              >
+                <span className="avatar avatar-placeholder">
+                  {c.partner.displayName.charAt(0)}
+                </span>
+                <span className="conversation-body">
+                  <strong>{c.partner.displayName}</strong>
+                  <small>
+                    {c.lastMessage?.content ?? '（メッセージはまだありません）'}
+                  </small>
+                </span>
               </button>
             </li>
           ))}
@@ -193,10 +208,17 @@ export default function ChatPage() {
       </aside>
       <main className="chat-main">
         {selected === null ? (
-          <p>左の一覧から会話を選ぶか、新しい会話を開始してください。</p>
+          <div className="empty-state chat-empty">
+            左の一覧から会話を選ぶか、新しい会話を開始してください。
+          </div>
         ) : (
           <>
-            <h2>{selected.partner.displayName} さんとの会話</h2>
+            <header className="chat-header">
+              <span className="avatar avatar-placeholder">
+                {selected.partner.displayName.charAt(0)}
+              </span>
+              <h2>{selected.partner.displayName} さんとの会話</h2>
+            </header>
             <div className="chat-messages">
               {messages.map((m) => (
                 <div
@@ -209,7 +231,7 @@ export default function ChatPage() {
                 </div>
               ))}
             </div>
-            <form onSubmit={sendMessage}>
+            <form className="message-form" onSubmit={sendMessage}>
               <input
                 value={text}
                 onChange={(e) => setText(e.target.value)}
